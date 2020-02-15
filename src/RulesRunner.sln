@@ -5,6 +5,11 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RulesRunner", "RulesRunner\RulesRunner.csproj", "{0B114816-22FC-41E0-B806-A00377E1AC9F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{1000D563-C2A2-4E9C-8FD7-9C2EC5FF5E43}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs\README.md = ..\docs\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
