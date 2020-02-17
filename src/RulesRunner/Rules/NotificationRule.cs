@@ -14,13 +14,18 @@ namespace RulesRunner.Rules {
     public class NotificationRule : Rule {
         private readonly IMediator _mediator;
 
+        public NotificationRule() {
+            //NOTE: moved dep resolution into default ctor to avoid issues with methods needing to be called in a specific order.
+            Dependency().Resolve(() => _mediator);
+        }
+
         public override void Define() {
             TransactionFact fact = null;
             IEnumerable<RuleCondition> conditions = null;
             Console.WriteLine($"Triggered: {this.GetType().Name}");
 
-            Dependency()
-                .Resolve(() => _mediator);
+            //Dependency()
+            //    .Resolve(() => _mediator);
 
             When()
                 .Match<TransactionFact>(() => fact)
@@ -35,12 +40,15 @@ namespace RulesRunner.Rules {
                 );
 
             Then()
-                .Do(ctx => SetNotifiedUser(_mediator, fact));
+                .Do(ctx => SetNotifiedUser(fact));
         }
 
-        private void SetNotifiedUser(IMediator mediator, TransactionFact fact) {
+        //Mediator probably doesn't need to be passed into this method since it's an 'instance method'
+        //although if the resolving of the dependency in done in the Define() the order in the method calls create
+        //an issue requiring a specific order of the method calls.
+        private void SetNotifiedUser(TransactionFact fact) {
             var command = new PingCommand();
-            var results = mediator.Send(command).GetAwaiter().GetResult();
+            var results = _mediator.Send(command).GetAwaiter().GetResult();
             Console.WriteLine($"PingCommand Results: {results}");
             fact.NotifiedUserInitials = "UserInitials";
         }
