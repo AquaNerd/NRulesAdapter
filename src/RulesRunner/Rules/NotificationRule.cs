@@ -25,25 +25,61 @@ namespace RulesRunner.Rules {
             When()
                 .Match<TransactionFact>(() => fact)
                 .Match<RuleCondition>(
-                        c => c.TransactionCode.Equals("all", StringComparison.InvariantCultureIgnoreCase) ? true : c.TransactionCode.Equals(fact.TransactionCode, StringComparison.InvariantCultureIgnoreCase),
-                        c => c.CompanyCode.Equals("all", StringComparison.InvariantCultureIgnoreCase) ? true : c.CompanyCode.Equals(fact.Company, StringComparison.InvariantCultureIgnoreCase),
-                        c => (
-                            c.SalesAmountOperator.Equals(ComparisonOperator.Equal) ? c.SalesAmount.Equals(fact.SalesAmount) :
-                            c.SalesAmountOperator.Equals(ComparisonOperator.GreaterThan) ? c.SalesAmount < fact.SalesAmount :
-                            c.SalesAmountOperator.Equals(ComparisonOperator.GreaterThanOrEqual) ? c.SalesAmount <= fact.SalesAmount :
-                            c.SalesAmountOperator.Equals(ComparisonOperator.LessThan) ? c.SalesAmount > fact.SalesAmount :
-                            c.SalesAmountOperator.Equals(ComparisonOperator.LessThanOrEqual) ? c.SalesAmount >= fact.SalesAmount : false
-                        )
-                    );
+                    c => c.TransactionCodeComparison(fact),
+                    c => c.CompanyCodeComparison(fact),
+                    c => c.SalesOrderComparison(fact)
+
+                    //c => _transactionCodeComparison(c, fact),
+                    //c => _companyCodeComparison(c, fact),
+                    //c => _salesOrderComparison(c, fact)
+                );
 
             Then()
                 .Do(ctx => SetNotifiedUser(_mediator, fact));
         }
+
         private void SetNotifiedUser(IMediator mediator, TransactionFact fact) {
             var command = new PingCommand();
             var results = mediator.Send(command).GetAwaiter().GetResult();
             Console.WriteLine($"PingCommand Results: {results}");
             fact.NotifiedUserInitials = "UserInitials";
         }
+
+        #region using Func
+        //private readonly Func<RuleCondition, TransactionFact, bool> _salesOrderComparison =
+        //    (condition, fact) => {
+        //        bool result = false;
+        //        switch (condition.SalesAmountOperator) {
+        //            case ComparisonOperator.Equal:
+        //                result = condition.SalesAmount.Equals(fact.SalesAmount);
+        //                break;
+        //            case ComparisonOperator.GreaterThan:
+        //                result = condition.SalesAmount < fact.SalesAmount;
+        //                break;
+        //            case ComparisonOperator.GreaterThanOrEqual:
+        //                result = condition.SalesAmount <= fact.SalesAmount;
+        //                break;
+        //            case ComparisonOperator.LessThan:
+        //                result = condition.SalesAmount > fact.SalesAmount;
+        //                break;
+        //            case ComparisonOperator.LessThanOrEqual:
+        //                result = condition.SalesAmount >= fact.SalesAmount;
+        //                break;
+        //        }
+
+        //        return result;
+        //    };
+
+        //private readonly Func<RuleCondition, TransactionFact, bool> _transactionCodeComparison =
+        //    (condition, fact) => condition.TransactionCode.Equals(fact.TransactionCode);
+
+        //private readonly Func<RuleCondition, TransactionFact, bool> _companyCodeComparison =
+        //    (condition, fact) => {
+        //        if (condition.CompanyCode.Equals("all", StringComparison.InvariantCultureIgnoreCase))
+        //            return true;
+
+        //        return condition.CompanyCode.Equals(fact.Company, StringComparison.InvariantCultureIgnoreCase);
+        //    };
+        #endregion
     }
 }
